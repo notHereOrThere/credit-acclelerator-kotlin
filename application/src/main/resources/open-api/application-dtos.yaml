@@ -1,0 +1,135 @@
+openapi: 3.0.0
+info:
+  title: Loan Application API
+  version: 1.0.0
+
+paths:
+  /application:
+    post:
+      summary: Прескоринг + запрос на расчёт возможных условий кредита.
+      operationId: calculateLoanOffers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanApplicationRequestDTO'
+      responses:
+        '200':
+          description: Список возможных предложений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoanOfferDTO'
+
+  /application/offer:
+    put:
+      summary: Выбор одного из предложений
+      operationId: chooseOffer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanOfferDTO'
+
+      responses:
+        '204':
+          description: Успешно выбрано предложение
+        '400':
+          description: Invalid input
+        '404':
+          description: Offer not found
+
+components:
+  schemas:
+    LoanApplicationRequestDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 300000
+          description: Запрашиваемая сумма
+        term:
+          type: integer
+          example: 15
+          description: Количество расчетных периодов
+        firstName:
+          type: string
+          example: Ivan
+          description: Имя
+        lastName:
+          type: string
+          example: Ivanov
+          description: Фамилия
+        middleName:
+          type: string
+          example: Ivanovich
+          description: Отчество
+        email:
+          type: string
+          example: ivan@example.com
+          description: Электронная почта
+        birthdate:
+          type: string
+          format: date
+          description: Дата рождения
+        passportSeries:
+          type: string
+          example: 1234
+          description: Серия паспорта
+        passportNumber:
+          type: string
+          example: 123456
+          description: Номер паспорта
+      required:
+        - amount
+        - term
+        - firstName
+        - lastName
+        - email
+        - birthdate
+        - passportSeries
+        - passportNumber
+
+    LoanOfferDTO:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          format: int64
+          example: 1
+        requestedAmount:
+          type: number
+          format: int64
+          example: 300000
+        totalAmount:
+          type: number
+          format: int64
+          example: 314500
+        term:
+          type: integer
+          example: 15
+        monthlyPayment:
+          type: number
+          format: int64
+          example: 22246.59
+        rate:
+          type: number
+          example: 9
+        isInsuranceEnabled:
+          type: boolean
+          example: true
+        isSalaryClient:
+          example: true
+          type: boolean
+      required:
+        - applicationId
+        - requestedAmount
+        - totalAmount
+        - term
+        - rate
+        - isInsuranceEnabled
+        - isSalaryClient

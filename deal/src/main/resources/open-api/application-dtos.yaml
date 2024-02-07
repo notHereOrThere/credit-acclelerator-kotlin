@@ -1,0 +1,391 @@
+openapi: 3.0.0
+info:
+  title: Deal API
+  description: API for loan processing in a deal
+  version: 1.0.0
+
+paths:
+  /deal/application:
+    post:
+      summary: Расчёт возможных условий кредита
+      operationId: calculateLoanConditions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanApplicationRequestDTO'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoanOfferDTO'
+        '500':
+          description: Error processing the request
+
+  /deal/offer:
+    put:
+      summary: Выбор одного из предложений
+      operationId: chooseLoanOffer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanOfferDTO'
+      responses:
+        '200':
+          description: Successful operation
+        '500':
+          description: Error processing the request
+
+  /deal/calculate/{applicationId}:
+    put:
+      summary: Завершение регистрации + полный подсчёт кредита
+      operationId: finishRegistrationAndCalculateLoan
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: ID заявки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinishRegistrationRequestDTO'
+      responses:
+        '200':
+          description: Successful operation
+        '500':
+          description: Error processing the request
+
+  /deal/document/{applicationId}/send:
+    post:
+      summary: Запрос на отправку документов
+      operationId: sendDocuments
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: ID заявки
+      responses:
+        '204':
+          description: Successful operation
+        '500':
+          description: Error processing the request
+
+  /deal/document/{applicationId}/sign:
+    post:
+      summary: Запрос на подписание документов
+      operationId: signDocuments
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: ID заявки
+      responses:
+        '204':
+          description: Successful operation
+        '500':
+          description: Error processing the request
+
+  /deal/document/{applicationId}/code:
+    post:
+      summary: Подписание документов
+      operationId: confirmSignDocuments
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: ID заявки
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SesDto'
+      responses:
+        '204':
+          description: Successful operation
+        '500':
+          description: Error processing the request
+
+components:
+  schemas:
+    LoanApplicationRequestDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 300000
+          description: Запрашиваемая сумма
+        term:
+          type: integer
+          example: 15
+          description: Количество расчетных периодов
+        firstName:
+          type: string
+          example: Ivan
+          description: Имя
+        lastName:
+          type: string
+          example: Ivanov
+          description: Фамилия
+        middleName:
+          type: string
+          example: Ivanovich
+          description: Отчество
+        email:
+          type: string
+          example: ivan@example.com
+          description: Электронная почта
+        birthdate:
+          type: string
+          format: date
+          description: Дата рождения
+        passportSeries:
+          type: string
+          example: 1234
+          description: Серия паспорта
+        passportNumber:
+          type: string
+          example: 123456
+          description: Номер паспорта
+      required:
+        - amount
+        - term
+        - firstName
+        - lastName
+        - email
+        - birthdate
+        - passportSeries
+        - passportNumber
+
+    LoanOfferDTO:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          format: int64
+          example: 8
+        requestedAmount:
+          type: number
+          format: int64
+          example: 300000
+        totalAmount:
+          type: number
+          format: int64
+          example: 314500
+        term:
+          type: integer
+          example: 15
+        monthlyPayment:
+          type: number
+          format: int64
+          example: 22246.59
+        rate:
+          format: int64
+          type: number
+          example: 9
+        isInsuranceEnabled:
+          type: boolean
+          example: true
+        isSalaryClient:
+          type: boolean
+          example: true
+
+    FinishRegistrationRequestDTO:
+      type: object
+      properties:
+        gender:
+          type: string
+          enum: [ male, female, non_binary ]
+          example: male
+          description: Пол
+        maritalStatus:
+          type: string
+          enum: [ married, single, divorce, widow_widower ]
+          example: married
+          description: Семейное положение
+        dependentAmount:
+          type: integer
+          example: 2
+          description: Количество людей на попечении
+        passportIssueDate:
+          type: string
+          format: date
+          description: Дата выдачи паспорта
+        passportIssueBranch:
+          type: string
+          example: ОВД района Иваново
+          description: Кем выдан паспорт
+        account:
+          type: string
+          example: 408178xxxxxxxxxx1234
+          description: Банковский счет
+        employment:
+          $ref: '#/components/schemas/EmploymentDTO'
+
+    EmploymentDTO:
+      type: object
+      properties:
+        employmentStatus:
+          type: string
+          enum: [ unemployed, self_employed, employed, business_owner ]
+          example: employed
+          description: Рабочий статус
+        employerINN:
+          type: string
+          example: 123456789
+          description: ИНН
+        salary:
+          type: number
+          example: 45000
+          description: Зарплата
+        position:
+          type: string
+          enum: [ worker, middle_manager, top_manager, owner ]
+          example: middle_manager
+          description: Позиция
+        workExperienceTotal:
+          type: integer
+          example: 120
+          description: Стаж (общий)
+        workExperienceCurrent:
+          type: integer
+          example: 60
+          description: Стаж (текущий)
+
+    CreditDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+        term:
+          type: integer
+        monthlyPayment:
+          type: number
+        rate:
+          type: number
+        psk:
+          type: number
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+        paymentSchedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentScheduleElement'
+
+    PaymentScheduleElement:
+      type: object
+      properties:
+        number:
+          type: integer
+        date:
+          type: string
+          format: date
+        totalPayment:
+          type: number
+        interestPayment:
+          type: number
+        debtPayment:
+          type: number
+        remainingDebt:
+          type: number
+
+    ScoringDataDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 300000
+          description: Запрашиваемая сумма
+        term:
+          type: integer
+          example: 15
+          description: Количество расчетных периодов
+        firstName:
+          type: string
+          example: Ivan
+          description: Имя
+        lastName:
+          type: string
+          example: Ivanov
+          description: Фамилия
+        middleName:
+          type: string
+          example: Ivanovich
+          description: Отчество
+        gender:
+          type: string
+          enum: [ male, female, non_binary ]
+          example: male
+          description: Пол
+        birthdate:
+          type: string
+          format: date
+          description: Дата рождения
+        passportSeries:
+          type: string
+          example: 1234
+          description: Серия паспорта
+        passportNumber:
+          type: string
+          example: 123456
+          description: Номер паспорта
+        passportIssueDate:
+          type: string
+          format: date
+          description: Дата выдачи паспорта
+        passportIssueBranch:
+          type: string
+          example: ОВД района Иваново
+          description: Кем выдан паспорт
+        maritalStatus:
+          type: string
+          enum: [ married, single, divorce, widow_widower ]
+          example: married
+          description: Семейное положение
+        dependentAmount:
+          type: integer
+          example: 2
+          description: Количество людей на попечении
+        employment:
+          $ref: '#/components/schemas/EmploymentDTO'
+        account:
+          type: string
+          example: 408178xxxxxxxxxx1234
+          description: Банковский счет
+        isInsuranceEnabled:
+          type: boolean
+          example: true
+          description: Активность страховки
+        isSalaryClient:
+          type: boolean
+          example: true
+          description: Зарплатный клиент
+
+    SesDto:
+      type: object
+      properties:
+        sesCode:
+          type: string

@@ -1,0 +1,287 @@
+openapi: 3.0.0
+info:
+  title: Conveyor API
+  description: API for loan processing with conveyor
+  version: 1.0.0
+
+paths:
+  /conveyor/offers:
+    post:
+      operationId: calculateLoanOffers
+      summary: Расчёт возможных условий кредита
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanApplicationRequestDTO'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LoanOfferDTO'
+        '500':
+          description: Error processing the request
+
+  /conveyor/calculation:
+    post:
+      operationId: performLoanCalculation
+      summary: Валидация присланных данных + скоринг данных + полный расчет параметров кредита
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScoringDataDTO'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditDTO'
+        '500':
+          description: Error processing the request
+
+components:
+  schemas:
+    LoanApplicationRequestDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 300000
+          description: Запрашиваемая сумма
+        term:
+          type: integer
+          example: 15
+          description: Количество расчетных периодов
+        firstName:
+          type: string
+          example: Ivan
+          description: Имя
+        lastName:
+          type: string
+          example: Ivanov
+          description: Фамилия
+        middleName:
+          type: string
+          example: Ivanovich
+          description: Отчество
+        email:
+          type: string
+          example: ivan@example.com
+          description: Электронная почта
+        birthdate:
+          type: string
+          format: date
+          description: Дата рождения
+        passportSeries:
+          type: string
+          example: 1234
+          description: Серия паспорта
+        passportNumber:
+          type: string
+          example: 123456
+          description: Номер паспорта
+      required:
+        - amount
+        - term
+        - firstName
+        - lastName
+        - email
+        - birthdate
+        - passportSeries
+        - passportNumber
+
+    LoanOfferDTO:
+      type: object
+      properties:
+        applicationId:
+          type: integer
+          format: int64
+        requestedAmount:
+          type: number
+        totalAmount:
+          type: number
+        term:
+          type: integer
+        monthlyPayment:
+          type: number
+        rate:
+          type: number
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+      required:
+        - applicationId
+        - requestedAmount
+        - totalAmount
+        - term
+        - rate
+        - isInsuranceEnabled
+        - isSalaryClient
+
+    ScoringDataDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 300000
+          description: Запрашиваемая сумма
+        term:
+          type: integer
+          example: 15
+          description: Количество расчетных периодов
+        firstName:
+          type: string
+          example: Ivan
+          description: Имя
+        lastName:
+          type: string
+          example: Ivanov
+          description: Фамилия
+        middleName:
+          type: string
+          example: Ivanovich
+          description: Отчество
+        gender:
+          type: string
+          enum: [ male, female, non_binary ]
+          example: male
+          description: Пол
+        birthdate:
+          type: string
+          format: date
+          description: Дата рождения
+        passportSeries:
+          type: string
+          example: 1234
+          description: Серия паспорта
+        passportNumber:
+          type: string
+          example: 123456
+          description: Номер паспорта
+        passportIssueDate:
+          type: string
+          format: date
+          description: Дата выдачи паспорта
+        passportIssueBranch:
+          type: string
+          example: ОВД района Иваново
+          description: Кем выдан паспорт
+        maritalStatus:
+          type: string
+          enum: [ married, single, divorce, widow_widower ]
+          example: married
+          description: Семейное положение
+        dependentAmount:
+          type: integer
+          example: 2
+          description: Количество людей на попечении
+        employment:
+          $ref: '#/components/schemas/EmploymentDTO'
+        account:
+          type: string
+          example: 408178xxxxxxxxxx1234
+          description: Банковский счет
+        isInsuranceEnabled:
+          type: boolean
+          example: true
+          description: Активность страховки
+        isSalaryClient:
+          type: boolean
+          example: true
+          description: Зарплатный клиент
+      required:
+        - amount
+        - term
+        - firstName
+        - lastName
+        - gender
+        - birthdate
+        - passportSeries
+        - passportNumber
+        - passportIssueDate
+        - passportIssueBranch
+        - maritalStatus
+        - dependentAmount
+        - employment
+        - account
+        - isInsuranceEnabled
+        - isSalaryClient
+
+
+    EmploymentDTO:
+      type: object
+      properties:
+        employmentStatus:
+          type: string
+          enum: [unemployed, self_employed, employed, business_owner ]
+          example: employed
+          description: Рабочий статус
+        employerINN:
+          type: string
+          example: 123456789
+          description: ИНН
+        salary:
+          type: number
+          example: 45000
+          description: Зарплата
+        position:
+          type: string
+          enum: [worker, middle_manager, top_manager, owner ]
+          example: middle_manager
+          description: Позиция
+        workExperienceTotal:
+          type: integer
+          example: 120
+          description: Стаж (общий)
+        workExperienceCurrent:
+          type: integer
+          example: 60
+          description: Стаж (текущий)
+
+    CreditDTO:
+      type: object
+      properties:
+        amount:
+          type: number
+        term:
+          type: integer
+        monthlyPayment:
+          type: number
+        rate:
+          type: number
+        psk:
+          type: number
+        isInsuranceEnabled:
+          type: boolean
+        isSalaryClient:
+          type: boolean
+        paymentSchedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentScheduleElement'
+
+    PaymentScheduleElement:
+      type: object
+      properties:
+        number:
+          type: integer
+        date:
+          type: string
+          format: date
+        totalPayment:
+          type: number
+        interestPayment:
+          type: number
+        debtPayment:
+          type: number
+        remainingDebt:
+          type: number

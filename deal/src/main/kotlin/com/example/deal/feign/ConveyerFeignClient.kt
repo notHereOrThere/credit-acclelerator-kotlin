@@ -10,7 +10,7 @@ import com.example.credit.application.model.ScoringDataDTO
 import org.springframework.stereotype.Service
 
 
-@FeignClient(name = "deal", url = "\${conveyer.url}")
+@FeignClient(name = "deal", url = "\${conveyor.url}")
 @Service
 interface ConveyerFeignClient {
     @PostMapping(value = ["/conveyor/offers"], produces = ["application/json"])

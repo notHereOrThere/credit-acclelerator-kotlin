@@ -36,6 +36,76 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
 
+  db:
+    image: postgres:15
+    container_name: db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d deal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_DB: deal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  conveyor-service:
+    image: conveyor-service
+    container_name: conveyor-service
+    ports:
+      - "8080:8080"
+    build:
+      context: conveyor
+      dockerfile: Dockerfile
+
+  deal-service:
+    image: deal-service
+    container_name: deal-service
+    build:
+      context: deal
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+      - kafka
+
+  dossier-service:
+    image: dossier-service
+    container_name: dossier-service
+    build:
+      context: dossier
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    ports:
+      - "8083:8083"
+
+  application-service:
+    image: application-service
+    container_name: application-service
+    build:
+      context: application
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+
+  gateway-service:
+    image: gateway-service
+    container_name: gateway-service
+    build:
+      context: gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+
+volumes:
+  db-data:
+
 networks:
   default:
     driver: bridge

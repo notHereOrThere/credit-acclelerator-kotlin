@@ -1,0 +1,94 @@
+name: SonarCloud
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  application:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+          projectBaseDir: application
+      - name: Analyze with SonarCloud
+        #       set environment variables:
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #       run sonar maven plugin:
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=credit-acclelerator-kotlin -Dsonar.organization=notHereOrThere -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+
+  deal:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+          projectBaseDir: deal
+      - name: Analyze with SonarCloud
+        #       set environment variables:
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #       run sonar maven plugin:
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=credit-acclelerator-kotlin -Dsonar.organization=notHereOrThere -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+
+  dossier:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+          projectBaseDir: dossier
+      - name: Analyze with SonarCloud
+        #       set environment variables:
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #       run sonar maven plugin:
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=credit-acclelerator-kotlin -Dsonar.organization=notHereOrThere -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+
+  conveyor:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+          projectBaseDir: conveyor
+      - name: Analyze with SonarCloud
+        #       set environment variables:
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #       run sonar maven plugin:
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=credit-acclelerator-kotlin -Dsonar.organization=notHereOrThere -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml
+
+  gateway:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+          projectBaseDir: gateway
+      - name: Analyze with SonarCloud
+        #       set environment variables:
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        #       run sonar maven plugin:
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=credit-acclelerator-kotlin -Dsonar.organization=notHereOrThere -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN -Dsonar.coverage.jacoco.xmlReportPaths=./target/site/jacoco/jacoco.xml

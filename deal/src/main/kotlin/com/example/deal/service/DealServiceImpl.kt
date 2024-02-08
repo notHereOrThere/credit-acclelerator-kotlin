@@ -12,6 +12,7 @@ import com.example.deal.exception.UserException
 import com.example.deal.feign.ConveyerFeignClient
 import com.example.deal.kafka.KafkaProducerService
 import com.example.deal.mapper.DealMapper
+import com.example.deal.metrics.ApplicationMetrics
 import com.example.deal.repository.ApplicationRepository
 import com.example.deal.repository.ClientRepository
 import com.example.deal.repository.CreditRepository
@@ -32,7 +33,8 @@ class DealServiceImpl @Autowired constructor
         private val clientRepository: ClientRepository,
         private val creditRepository: CreditRepository,
         private val applicationRepository: ApplicationRepository,
-        private val kafkaProducerService: KafkaProducerService
+        private val kafkaProducerService: KafkaProducerService,
+        private val applicationMetrics: ApplicationMetrics
 ) : DealService {
     @Value("\${topic.finish-registration}")
     private val finishRegistration: String? = null
@@ -71,6 +73,8 @@ class DealServiceImpl @Autowired constructor
             buildApplicationHistory(application, "Отказ")
             application.status = (ApplicationStatus.CC_DENIED)
             applicationRepository!!.save(application)
+
+            applicationMetrics.incrementStatusCounter(application.status)
             throw UserException(e.message)
         } catch (e: FeignException) {
             throw RuntimeException(e.message, e)
@@ -83,6 +87,8 @@ class DealServiceImpl @Autowired constructor
         with(application) {
             status = ApplicationStatus.PREAPPROVAL
             this.client = client
+
+            applicationMetrics.incrementStatusCounter(status)
         }
         val applicationId: Long? = applicationRepository.save(application).applicationId
         loanOfferDTOs!!.forEach(Consumer { e: LoanOfferDTO? ->
@@ -98,6 +104,9 @@ class DealServiceImpl @Autowired constructor
         val loanOffer = dealMapper!!.loanOfferDtoToLoanOfferEntity(loanOfferDTO)
         application.appliedOffer = loanOffer
         application.status = ApplicationStatus.APPROVED
+
+        applicationMetrics.incrementStatusCounter(application.status)
+
         applicationRepository.save(application)
         val emailDto = EmailDto()
 
@@ -134,6 +143,7 @@ class DealServiceImpl @Autowired constructor
             feignClient!!.performLoanCalculation(scoringDataDTO)
         } catch (e: FeignException.BadRequest) {
             application.status = ApplicationStatus.CC_DENIED
+            applicationMetrics.incrementStatusCounter(application.status)
             buildApplicationHistory(application, "Скоринг не пройден")
             applicationRepository.save(application)
             val emailDto = EmailDto()
@@ -158,6 +168,7 @@ class DealServiceImpl @Autowired constructor
             creditRepository!!.save(credit)
         }
         application.status = ApplicationStatus.CC_APPROVED
+        applicationMetrics.incrementStatusCounter(application.status)
         application.credit = credit
         buildApplicationHistory(application, "Подтверждение")
         applicationRepository.save(application)
@@ -176,6 +187,7 @@ class DealServiceImpl @Autowired constructor
         val application = applicationRepository!!.findById(applicationId!!).orElseThrow { EntityNotFoundException() }!!
         buildApplicationHistory(application, "Подготовка документов.")
         application.status = ApplicationStatus.PREPARE_DOCUMENT
+        applicationMetrics.incrementStatusCounter(application.status)
         applicationRepository.save(application)
         kafkaProducerService!!.send(sendDocuments, application)
     }
@@ -215,6 +227,7 @@ class DealServiceImpl @Autowired constructor
             return
         }
         application.status = ApplicationStatus.CREDIT_ISSUED
+        applicationMetrics.incrementStatusCounter(application.status)
         buildApplicationHistory(application, "Кредит выдан")
         applicationRepository.save(application)
         val emailDto = EmailDto()

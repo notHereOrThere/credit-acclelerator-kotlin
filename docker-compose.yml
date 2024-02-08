@@ -103,8 +103,32 @@ services:
     ports:
       - "8084:8084"
 
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./deal/src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+#подрубаться к прометиус через графана по доменному имени
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "8079:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: "ADMIN"
+      GF_SECURITY_ADMIN_PASSWORD: ADMIN
+    volumes:
+      - grafana_data:/var/lib/grafana
+
 volumes:
   db-data:
+  grafana_data:
 
 networks:
   default:

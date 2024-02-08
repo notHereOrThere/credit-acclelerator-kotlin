@@ -14,33 +14,20 @@ class ApplicationMetrics(
     private val applicationRepository: ApplicationRepository
     ) {
 
-    private val countersByStatus = mutableMapOf<ApplicationStatus?, Int>()
+    private val countersByStatus = ApplicationStatus.values().associateWith { status ->
+        meterRegistry.counter("application_status", "status", status.name)
+    }
 
     @PostConstruct
     fun init() {
-
-        val statusMap : Map<ApplicationStatus?, Int> =
-            applicationRepository.findAll().groupBy { it?.status }
-                .mapValues { (_, value) -> value.size  }
-
-        ApplicationStatus.values().forEach { e->
-            countersByStatus[e] = 0
+        val statusCounts = applicationRepository.findAll().groupingBy { it?.status }.eachCount()
+        statusCounts.forEach { (status, count) ->
+            val counter = countersByStatus[status]
+            repeat(count) { counter?.increment() }
         }
-
-        statusMap.forEach { e ->
-            countersByStatus[e.key] = e.value
-        }
-
-        countersByStatus.forEach { entry ->
-            Counter.builder("counter_application_status")
-                .description("Number of applications in each status")
-                .tag("status ${entry.key}", entry.value.toString())
-                .register(meterRegistry)
-        }
-
     }
 
     fun incrementStatusCounter(status: ApplicationStatus?) {
-        countersByStatus[status]?.inc()
+        countersByStatus[status]?.increment()
     }
 }

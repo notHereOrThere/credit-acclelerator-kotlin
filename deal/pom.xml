@@ -207,7 +207,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.4</version>
+				<version>0.8.7</version>
 				<executions>
 					<execution>
 						<goals>
@@ -233,6 +233,8 @@
 					<includes>
 						<include>**/*Test*.java</include>
 						<include>**/*IT*.java</include>
+						<include>**/*Test*.kt</include>
+						<include>**/*IT*.kt</include>
 					</includes>
 				</configuration>
 			</plugin>

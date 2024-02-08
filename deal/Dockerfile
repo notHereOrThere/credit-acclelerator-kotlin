@@ -5,12 +5,9 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 FROM openjdk:11-jre-slim
+RUN groupadd -r appuser && useradd --no-log-init -r -g appuser appuser
 WORKDIR /app
 COPY --from=builder /app/target/*.jar deal.jar
+RUN chown -R appuser:appuser /app
+USER appuser
 CMD ["java", "-jar", "deal.jar"]
-
-
-#FROM openjdk:11-jre-slim
-#WORKDIR /app
-#COPY ./target/deal.jar ./deal.jar
-#CMD ["java", "-jar", "deal.jar"]

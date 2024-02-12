@@ -2,7 +2,6 @@ package com.example.deal.metrics
 
 import com.example.deal.entity.enums.ApplicationStatus
 import com.example.deal.repository.ApplicationRepository
-import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct

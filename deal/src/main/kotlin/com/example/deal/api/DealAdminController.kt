@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 class DealAdminController (private val dealService: DealService) {
 
 
-    @get:Operation(
+    @Operation(
         summary = "Получить все заявки.",
         responses = [ApiResponse(
             responseCode = "200",
@@ -29,12 +29,11 @@ class DealAdminController (private val dealService: DealService) {
             description = "Error processing the request"
         )]
     )
-    @get:GetMapping("/application")
-    val allApplications: ResponseEntity<List<Application>>
-        get() {
-            val applications: List<Application> = dealService.allApplications as List<Application>
-            return ResponseEntity.ok(applications)
-        }
+    @GetMapping("/application")
+    fun allApplications(): ResponseEntity<List<Application>> {
+        val applications: List<Application> = dealService.fetchAllApplications() as List<Application>
+        return ResponseEntity.ok(applications)
+    }
 
     @GetMapping("/application/{applicationId}")
     @Operation(

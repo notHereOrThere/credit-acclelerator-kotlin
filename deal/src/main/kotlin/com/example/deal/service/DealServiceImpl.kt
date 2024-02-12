@@ -1,12 +1,14 @@
 package com.example.deal.service
 
 import com.example.credit.application.model.*
+import com.example.deal.config.SendToAudit
 import com.example.deal.dto.EmailDto
 import com.example.deal.entity.Application
 import com.example.deal.entity.Client
 import com.example.deal.entity.enums.ApplicationStatus
 import com.example.deal.entity.enums.ChangeType
 import com.example.deal.entity.enums.Status
+import com.example.deal.dto.enums.Type
 import com.example.deal.entity.inner.StatusHistory
 import com.example.deal.exception.UserException
 import com.example.deal.feign.ConveyerFeignClient
@@ -17,7 +19,6 @@ import com.example.deal.repository.ApplicationRepository
 import com.example.deal.repository.ClientRepository
 import com.example.deal.repository.CreditRepository
 import feign.FeignException
-import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -54,7 +55,7 @@ class DealServiceImpl @Autowired constructor
     @Value("\${topic.application-denied}")
     private val applicationDenied: String? = null
 
-
+    @SendToAudit(service = com.example.deal.dto.enums.Service.CONVEYOR, type = Type.START)
     override fun calculateLoanConditions(loanApplicationRequestDTO: LoanApplicationRequestDTO?): List<LoanOfferDTO?> {
         val application = Application()
         application.creationDate = Date()
@@ -63,10 +64,8 @@ class DealServiceImpl @Autowired constructor
             feignClient!!.calculateLoanOffers(loanApplicationRequestDTO)
         } catch (e: FeignException.BadRequest) {
             val emailDto = EmailDto()
-            emailDto.fio = loanApplicationRequestDTO!!.lastName + " " + loanApplicationRequestDTO.firstName
-            if (!StringUtils.isBlank(loanApplicationRequestDTO.middleName)) {
-                emailDto.fio = emailDto.fio + " " + loanApplicationRequestDTO.middleName
-            }
+            emailDto.fio = loanApplicationRequestDTO!!.lastName + " " +
+                    loanApplicationRequestDTO.firstName + " " + loanApplicationRequestDTO.middleName
             emailDto.email = loanApplicationRequestDTO.email
             emailDto.emailText = "В ходе выполнения перскоринга выявлена ошибка: " + e.message
             kafkaProducerService!!.send(applicationDenied, emailDto)
@@ -97,6 +96,7 @@ class DealServiceImpl @Autowired constructor
         return loanOfferDTOs
     }
 
+    @SendToAudit(service = com.example.deal.dto.enums.Service.CONVEYOR, type = Type.SUCCESS)
     override fun chooseLoanOffer(loanOfferDTO: LoanOfferDTO?) {
         val application =
             applicationRepository!!.findById(loanOfferDTO!!.applicationId).orElseThrow { EntityNotFoundException() }!!
@@ -183,6 +183,7 @@ class DealServiceImpl @Autowired constructor
         kafkaProducerService!!.send(createDocument, emailDto)
     }
 
+    @SendToAudit(service = com.example.deal.dto.enums.Service.DEAL, type = Type.SUCCESS)
     override fun sendDocuments(applicationId: Long?) {
         val application = applicationRepository!!.findById(applicationId!!).orElseThrow { EntityNotFoundException() }!!
         buildApplicationHistory(application, "Подготовка документов.")
@@ -212,6 +213,7 @@ class DealServiceImpl @Autowired constructor
         kafkaProducerService!!.send(sendSes, emailDto)
     }
 
+    @SendToAudit(service = com.example.deal.dto.enums.Service.DOSSIER, type = Type.SUCCESS)
     override fun codeDocuments(applicationId: Long?, sesDto: SesDto?) {
         val application = applicationRepository!!.findById(applicationId!!).orElseThrow { EntityNotFoundException() }!!
         if (!application.sesCode.equals(sesDto!!.sesCode)) {
@@ -241,9 +243,12 @@ class DealServiceImpl @Autowired constructor
         kafkaProducerService!!.send(creditIssued, emailDto)
     }
 
-    override val allApplications: List<Application?>
-        get() = applicationRepository.findAll()
+    @SendToAudit(service = com.example.deal.dto.enums.Service.DEAL, type = Type.SUCCESS)
+    override fun fetchAllApplications() : MutableList<Application?> {
+        return applicationRepository.findAll()
+    }
 
+    @SendToAudit(service = com.example.deal.dto.enums.Service.DEAL, type = Type.SUCCESS)
     override fun getApplicationById(applicationId: Long?): Application? {
         return applicationRepository.findById(applicationId!!).orElseThrow { EntityNotFoundException() }
     }

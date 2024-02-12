@@ -1,0 +1,87 @@
+openapi: 3.0.0
+info:
+  title: Audit Event API
+  version: 1.0.0
+  description: API for managing audit events stored in Redis.
+
+paths:
+  /audit-events/{uuid}:
+    get:
+      summary: Get an audit event by UUID
+      operationId: getAuditEventByUUID
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The UUID of the audit event to retrieve.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditDto'
+        '404':
+          description: Audit event not found
+
+  /audit-events/query:
+    post:
+      summary: Query audit events by service and type
+      operationId: queryAuditEventsByServiceAndType
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuditRequestDto'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditDto'
+        '400':
+          description: Invalid request
+        '404':
+          description: No matching audit events found
+
+components:
+  schemas:
+    AuditDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Unique identifier for the audit event.
+        type:
+          $ref: '#/components/schemas/Type'
+        service:
+          $ref: '#/components/schemas/Service'
+        message:
+          type: string
+          description: Message of the audit event.
+
+    AuditRequestDto:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/Type'
+        service:
+          $ref: '#/components/schemas/Service'
+        message:
+          type: string
+          description: Message of the audit event.
+    Type:
+      type: string
+      enum: [ FAILURE, SUCCESS, START ]
+      description: Type of the audit event.
+    Service:
+      type: string
+      enum: [ CONVEYOR, APPLICATION, DOSSIER, DEAL ]
+      description: Service associated with the audit event.

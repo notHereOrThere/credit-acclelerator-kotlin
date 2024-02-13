@@ -9,3 +9,9 @@ put: /deal/calculate/{applicationId}
 post: /deal/document/{applicationId}/send
 
 post: /deal/document/{applicationId}/code
+
+также в заголвки запросов необходимо добавлять jwt
+для этого надо зарегистроваться по 
+post: /auth/register {"username":..., "password": ...}
+или залогиниться по 
+post: /auth/login {"username":..., "password": ...}

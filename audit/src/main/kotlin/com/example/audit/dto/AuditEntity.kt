@@ -12,7 +12,9 @@ import java.util.UUID
 data class AuditEntity (
     @Id
     var uuid: UUID,
+    @Indexed
     val type: Type,
+    @Indexed
     var service: Service,
     var message: String
 )

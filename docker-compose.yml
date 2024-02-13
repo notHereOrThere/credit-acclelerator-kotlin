@@ -130,13 +130,13 @@ services:
     image: redis/redis-stack
     container_name: redis
     ports:
-      - 6379:6379
+      - "6379:6379"
 
   redis-insight:
     image: redislabs/redisinsight
     container_name: redis-insight
     ports:
-      - 8001:8001
+      - "8001:8001"
 
   audit-service:
     image: audit-service

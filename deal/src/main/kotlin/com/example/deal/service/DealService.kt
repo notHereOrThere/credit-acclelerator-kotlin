@@ -17,7 +17,7 @@ interface DealService {
     fun sendDocuments(applicationId: Long?)
     fun signDocuments(applicationId: Long?)
     fun codeDocuments(applicationId: Long?, sesDto: SesDto?)
-    val allApplications: List<Application?>?
+    fun fetchAllApplications(): List<Application?>
 
     fun getApplicationById(applicationId: Long?): Application?
 }

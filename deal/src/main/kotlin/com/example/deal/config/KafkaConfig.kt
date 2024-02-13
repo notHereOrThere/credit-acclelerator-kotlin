@@ -32,6 +32,9 @@ class KafkaConfig {
     @Value("\${topic.application-denied}")
     private val applicationDenied: String? = null
 
+    @Value("\${topic.audit}")
+    private val audit: String? = null
+
     @Value("\${replicas.count}")
     private val replicasCount: Int? = null
 
@@ -57,7 +60,8 @@ class KafkaConfig {
             NewTopic(sendDocuments, partitionsCount, replicasCount.toShort()),
             NewTopic(sendSes, partitionsCount, replicasCount.toShort()),
             NewTopic(creditIssued, partitionsCount, replicasCount.toShort()),
-            NewTopic(applicationDenied, partitionsCount, replicasCount.toShort())
+            NewTopic(applicationDenied, partitionsCount, replicasCount.toShort()),
+            NewTopic(audit, partitionsCount, replicasCount.toShort())
         )
     }
 }

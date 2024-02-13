@@ -24,7 +24,7 @@ class DealController (private val dealService: DealService): DealApi {
     //    вызов из application
     override fun calculateLoanConditions(loanApplicationRequestDTO: LoanApplicationRequestDTO): ResponseEntity<List<LoanOfferDTO>> {
         val loanOfferDTOs = dealService.calculateLoanConditions(loanApplicationRequestDTO)
-        return ResponseEntity.ok(loanOfferDTOs as List<LoanOfferDTO>)
+        return ResponseEntity.ok(loanOfferDTOs.filterNotNull())
     }
 
     //    вызов из application

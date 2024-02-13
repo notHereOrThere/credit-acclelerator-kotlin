@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        service: [application, deal, dossier, conveyor, gateway, audit]
+        service: [application, deal, dossier, conveyor, gateway, audit, auth]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11

@@ -49,7 +49,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: root
     ports:
-      - "5433:5432"
+      - "5532:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
 
@@ -149,9 +149,38 @@ services:
     depends_on:
       - redis
 
+  db-auth:
+    image: postgres:15
+    container_name: db-auth
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d deal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_DB: auth
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5442:5432"
+    volumes:
+      - db-auth-data:/var/lib/postgresql/data
+
+  auth-service:
+    image: auth-service
+    container_name: auth-service
+    build:
+      context: auth
+      dockerfile: Dockerfile
+    ports:
+      - "8086:8086"
+    depends_on:
+      - db-auth
+
 volumes:
   db-data:
   grafana_data:
+  db-auth-data:
 
 networks:
   default:

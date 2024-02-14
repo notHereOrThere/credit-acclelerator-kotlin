@@ -12,7 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("auth")
+@RequestMapping("/auth")
 class AuthController (private val jwtUserDetailsService: JwtUserDetailsService,
                       private val authenticationManager: AuthenticationManager,
                       private val tokenManager: TokenManager,

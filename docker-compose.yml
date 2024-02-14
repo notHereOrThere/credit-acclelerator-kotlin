@@ -73,6 +73,7 @@ services:
     depends_on:
       - db
       - kafka
+      - conveyor-service
 
   dossier-service:
     image: dossier-service

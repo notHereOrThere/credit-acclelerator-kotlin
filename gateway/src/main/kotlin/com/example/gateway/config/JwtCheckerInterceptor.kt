@@ -14,6 +14,9 @@ class JwtCheckerInterceptor (private val tokenManager: TokenManager): HandlerInt
 
     @Throws(ServletException::class, IOException::class)
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        if (isSwaggerPath(request.requestURI)) {
+            return true
+        }
         val tokenHeader = request.getHeader("Authorization")
         var username: String? = null
         var token: String? = null
@@ -30,5 +33,9 @@ class JwtCheckerInterceptor (private val tokenManager: TokenManager): HandlerInt
             println("not authorized")
         }
         return tokenManager.validateJwtToken(token)
+    }
+
+    private fun isSwaggerPath(path: String): Boolean {
+        return listOf("/v3/api-docs/swagger-config", "/swagger-ui/", "/v2/api-docs", "/v3/api-docs", "/swagger-resources","/webjars/", "/auth").any(){path.startsWith(it)}
     }
 }

@@ -37,6 +37,7 @@ class MailConfig {
             val properties = mailSender.javaMailProperties
             properties.setProperty("mail.transport.protocol", protocol)
             properties.setProperty("mail.debug", debug)
+
             return mailSender
         }
 }

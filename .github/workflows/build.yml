@@ -61,7 +61,7 @@ jobs:
 
       - name: Build and verify ${{ matrix.service }}
         run: |
-          cd services/${{ matrix.service }}
+          cd ${{ matrix.service }}
           mvn -B clean verify
 
       - name: Upload Test Coverage to Codecov
@@ -69,7 +69,7 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: services/${{ matrix.service }}/target/site/jacoco/
+          directory: ${{ matrix.service }}/target/site/jacoco/
           flags: ${{ matrix.service }}
           name: codecov-umbrella
 

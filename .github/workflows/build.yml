@@ -73,6 +73,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
+          distribution: 'temurin'
 
       - name: Set environment variables
         run: echo "SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:9092" >> $GITHUB_ENV

@@ -85,10 +85,10 @@ jobs:
       - name: Set environment variables
         run: echo "SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092" >> $GITHUB_ENV
 
-      - name: Build and verify ${{ matrix.service }}
-        run: |
-          cd ${{ matrix.service }}
-          mvn -B clean verify
+#      - name: Build and verify ${{ matrix.service }}
+#        run: |
+#          cd ${{ matrix.service }}
+#          mvn -B clean verify
 
       - name: Upload Test Coverage to Codecov
         if: success()

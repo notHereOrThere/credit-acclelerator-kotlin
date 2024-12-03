@@ -26,19 +26,19 @@ jobs:
         with:
           filters: |
             application:
-              - 'services/application/**'
+              - 'application/**'
             deal:
-              - 'services/deal/**'
+              - 'deal/**'
             dossier:
-              - 'services/dossier/**'
+              - 'dossier/**'
             conveyor:
-              - 'services/conveyor/**'
+              - 'conveyor/**'
             gateway:
-              - 'services/gateway/**'
+              - 'gateway/**'
             audit:
-              - 'services/audit/**'
+              - 'audit/**'
             auth:
-              - 'services/auth/**'
+              - 'auth/**'
 
   build-and-test:
     needs: determine-changes
@@ -95,6 +95,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./services/${{ matrix.service }}
+          context: ./${{ matrix.service }}
           push: true
           tags: ibra26gim/${{ matrix.service }}:latest

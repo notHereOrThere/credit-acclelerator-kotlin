@@ -55,20 +55,20 @@ jobs:
         ports:
           - 9092:9092
         options: >-
-          --env KAFKA_BROKER_ID:1
           --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-          --env KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-          --env KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-          --env KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
-          --env KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-          --env KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-          --env KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-          --env KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-          --env KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+          --env KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092
+          --env KAFKA_LISTENER_SECURITY_PROTOCOL=PLAINTEXT
+          --env KAFKA_LISTENER_NAME_INTERNAL=INTERNAL
+          --env KAFKA_LISTENERS=PLAINTEXT://kafka:29092
+          --env KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092
+          --env KAFKA_LISTENER_SECURITY_PROTOCOL=PLAINTEXT
     strategy:
       matrix:
         service: [application, deal, dossier, conveyor, gateway, audit, auth]
     steps:
+      - name: Verify environment variables
+        run: echo $SPRING_KAFKA_BOOTSTRAP_SERVERS
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -83,7 +83,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Set environment variables
-        run: echo "SPRING_KAFKA_BOOTSTRAP_SERVERS=localhost:9092" >> $GITHUB_ENV
+        run: echo "SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092" >> $GITHUB_ENV
 
       - name: Build and verify ${{ matrix.service }}
         run: |

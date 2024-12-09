@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-application-service
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: application-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.server.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-application-config
+          env:
+            - name: SERVER_PORT
+              value: "{{ .Values.server.port }}"
+            - name: DEAL_URL
+              value: "{{ .Values.deal.url }}"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-application-service
+spec:
+  ports:
+    - port: {{ .Values.server.port }}
+  selector:
+    app: {{ .Chart.Name }}

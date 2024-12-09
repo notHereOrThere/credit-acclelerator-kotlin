@@ -1,0 +1,20 @@
+replicaCount: 2
+
+image:
+  repository: ibra26gim/dossier
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8083
+
+config:
+  serverPort: 8083
+  dealUrl: deal-service:8081
+  kafkaBootstrapServers: kafka:29092
+  mailUsername: korkmazovibra@yandex.ru
+  mailPassword: cyvgulsdlotctlay
+  mailHost: smtp.yandex.ru
+
+resources: {}

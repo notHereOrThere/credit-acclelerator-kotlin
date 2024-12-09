@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-config
+  labels:
+    app: kafka
+data:
+  server.properties: |
+    broker.id={{ .Values.config.brokerId }}
+    log.dirs={{ .Values.config.logDirs }}
+    zookeeper.connect={{ .Values.config.zookeeperConnect }}
+    listeners=PLAINTEXT://:{{ .Values.service.port }}

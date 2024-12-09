@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-auth-config
+data:
+  application.properties: |
+    server.port={{ .Values.server.port }}
+    spring.datasource.url={{ .Values.database.springDatasourceUrl }}
+    spring.datasource.username={{ .Values.database.username }}
+    spring.datasource.password={{ .Values.database.password }}
+    secret={{ .Values.secret }}
+    expiration={{ .Values.expiration }}

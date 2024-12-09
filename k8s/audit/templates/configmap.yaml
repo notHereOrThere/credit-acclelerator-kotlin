@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-audit-config
+data:
+  application.properties: |
+    server.port=${SERVER_PORT:8085}
+    spring.kafka.consumer.bootstrap-servers=${KAFKA_BOOTSTRAP_SERVERS:kafka:29092}
+    topic.audit=${TOPIC_AUDIT:audit}
+    spring.redis.host=${REDIS_HOST:redis}
+    spring.redis.port=${REDIS_PORT:6379}

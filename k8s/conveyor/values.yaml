@@ -1,0 +1,11 @@
+replicaCount: 2
+
+image:
+  repository: ibra26gim/conveyor
+  tag: latest
+  pullPolicy: IfNotPresent
+
+server:
+  port: 8080
+
+baseRate: 15

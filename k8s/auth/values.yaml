@@ -1,0 +1,23 @@
+replicaCount: 2
+
+image:
+  repository: ibra26gim/auth
+  tag: latest
+  pullPolicy: IfNotPresent
+
+server:
+  port: 8086
+
+database:
+  springDatasourceUrl: jdbc:postgresql://db-auth:5432/auth
+  name: auth
+  username: postgres
+  password: root
+  host: db-auth
+  port: 5432
+  persistence:
+    enabled: true
+    size: 4Gi
+
+secret: somerandomsecret
+expiration: 36000

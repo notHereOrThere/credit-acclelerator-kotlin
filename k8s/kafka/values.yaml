@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: bitnami/kafka
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 29092
+
+zookeeper:
+  image:
+    repository: bitnami/zookeeper
+    tag: latest
+  service:
+    port: 2181
+
+config:
+  brokerId: 1
+  logDirs: /bitnami/kafka/data
+  zookeeperConnect: zookeeper:2181
+
+kafkaUi:
+  enabled: true
+  image:
+    repository: provectuslabs/kafka-ui
+    tag: latest
+  service:
+    type: NodePort
+    port: 8080
+    nodePort: 30001

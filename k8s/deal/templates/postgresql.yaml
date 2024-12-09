@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-postgresql
+  labels:
+    app: {{ .Chart.Name }}-postgresql
+spec:
+  serviceName: {{ .Release.Name }}-postgresql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-postgresql
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-postgresql
+    spec:
+      containers:
+        - name: postgres
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.postgresql.service.port }}
+          env:
+            - name: POSTGRES_DB
+              value: "{{ .Values.postgresql.env.POSTGRES_DB }}"
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgresql.env.POSTGRES_USER }}"
+            - name: POSTGRES_PASSWORD
+              value: "{{ .Values.postgresql.env.POSTGRES_PASSWORD }}"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-gateway-config
+data:
+  application.properties: |
+    server.port={{ .Values.env.SERVER_PORT }}
+    deal.url={{ .Values.env.DEAL_URL }}
+    application.url={{ .Values.env.APPLICATION_URL }}
+    audit.url={{ .Values.env.AUDIT_URL }}
+    auth.url={{ .Values.env.AUTH_URL }}
+    spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER
+    secret={{ .Values.env.SECRET }}

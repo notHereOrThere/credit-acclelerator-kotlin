@@ -1,0 +1,4 @@
+apiVersion: v2
+name: dossier
+description: Helm Chart for Dossier Service
+version: 0.1.0

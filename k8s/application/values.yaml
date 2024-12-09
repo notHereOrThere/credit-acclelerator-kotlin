@@ -1,0 +1,18 @@
+replicaCount: 2
+
+image:
+  repository: ibra26gim/application-service
+  tag: latest
+  pullPolicy: Always
+
+server:
+  port: 8082
+
+deal:
+  url: deal-service:8081
+
+env:
+  - name: SERVER_PORT
+    value: "{{ .Values.server.port }}"
+  - name: DEAL_URL
+    value: "{{ .Values.deal.url }}"

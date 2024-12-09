@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-auth-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-auth-db
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-auth-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:13
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.database.username }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.database.password }}
+            - name: POSTGRES_DB
+              value: {{ .Values.database.name }}
+          ports:
+            - containerPort: {{ .Values.database.port }}
+          volumeMounts:
+            - name: auth-db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: auth-db-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-auth-db-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-auth-db
+spec:
+  ports:
+    - port: {{ .Values.database.port }}
+  selector:
+    app: {{ .Release.Name }}-auth-db

@@ -1,0 +1,18 @@
+replicaCount: 2
+
+image:
+  repository: ibra26gim/gateway
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8084
+
+env:
+  SERVER_PORT: 8084
+  DEAL_URL: deal-service:8081
+  APPLICATION_URL: application-service:8082
+  AUDIT_URL: audit-service:8085
+  AUTH_URL: auth-service:8086
+  SECRET: somerandomsecret

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-gateway
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      containers:
+        - name: gateway
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            - name: SERVER_PORT
+              value: "{{ .Values.env.SERVER_PORT }}"
+            - name: DEAL_URL
+              value: "{{ .Values.env.DEAL_URL }}"
+            - name: APPLICATION_URL
+              value: "{{ .Values.env.APPLICATION_URL }}"
+            - name: AUDIT_URL
+              value: "{{ .Values.env.AUDIT_URL }}"
+            - name: AUTH_URL
+              value: "{{ .Values.env.AUTH_URL }}"
+            - name: SECRET
+              value: "{{ .Values.env.SECRET }}"

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: conveyor
+description: Helm chart for the Conveyor microservice
+version: 0.1.0
+appVersion: "1.0.0"

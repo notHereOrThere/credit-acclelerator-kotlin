@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-conveyor-config
+data:
+  application.properties: |
+    base.rate={{ .Values.baseRate }}

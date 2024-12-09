@@ -1,0 +1,16 @@
+{{- if .Values.kafkaUi.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  labels:
+    app: kafka-ui
+spec:
+  type: {{ .Values.kafkaUi.service.type }}
+  ports:
+    - port: {{ .Values.kafkaUi.service.port }}
+      targetPort: {{ .Values.kafkaUi.service.port }}
+      nodePort: {{ .Values.kafkaUi.service.nodePort }}
+  selector:
+    app: kafka-ui
+{{- end }}
